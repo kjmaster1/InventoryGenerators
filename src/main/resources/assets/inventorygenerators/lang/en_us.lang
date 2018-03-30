@@ -1,0 +1,13 @@
+itemGroup.invgens=Inventory Generators
+
+item.inv_culinary_gen.name=Inventory Culinary Generator
+item.inv_end_gen.name=Inventory End Generator
+
+info.invgens.0=Generates Redstone Flux from burnable items in inventory (from top left to bottom right). Can recharge items in inventory (including armor).
+info.invgens.1=Charging Items
+info.invgens.2=Use while sneaking to deactivate.
+info.invgens.3=Use while sneaking to activate.
+info.invgens.charge=Charge
+info.invgens.send=Send
+info.invgens.receive=Receive
+info.invgens.burnTimeLeft=Burn time remaining

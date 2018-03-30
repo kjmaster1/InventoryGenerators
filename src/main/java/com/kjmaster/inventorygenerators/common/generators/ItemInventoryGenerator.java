@@ -1,11 +1,15 @@
 package com.kjmaster.inventorygenerators.common.generators;
 
 import com.kjmaster.inventorygenerators.InventoryGenerators;
+import com.kjmaster.inventorygenerators.client.IHasModel;
 import com.kjmaster.kjlib.common.energy.IItemEnergy;
 import com.kjmaster.kjlib.common.energy.InvEnergyStorage;
 import com.kjmaster.kjlib.common.items.ItemBase;
 import com.kjmaster.kjlib.utils.CapabilityUtils;
 import com.kjmaster.kjlib.utils.StringHelper;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,18 +21,40 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemInventoryGenerator extends ItemBase implements IInventoryGenerator, IItemEnergy {
+public class ItemInventoryGenerator extends ItemBase implements IInventoryGenerator, IItemEnergy, IHasModel {
 
     public ItemInventoryGenerator(String name) {
         super(name, InventoryGenerators.invGenTab, 1);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        ModelResourceLocation onModel = new ModelResourceLocation(getRegistryName() + "_on", "inventory");
+        ModelResourceLocation offModel = new ModelResourceLocation(getRegistryName() + "_off", "inventory");
+
+        ModelBakery.registerItemVariants(this, onModel, offModel);
+
+        ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition() {
+            @Override
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                if (isOn(stack)) {
+                    return onModel;
+                } else {
+                    return offModel;
+                }
+            }
+        });
     }
 
     @Override
@@ -37,12 +63,31 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             IInventoryGenerator inventoryGenerator = (IInventoryGenerator) stack.getItem();
             if (!stack.hasTagCompound()) {
                 inventoryGenerator.giveTagCompound(stack);
+            }  else if (stack.hasTagCompound()) {
+                NBTTagCompound tagCompound = stack.getTagCompound();
+                if (!tagCompound.hasKey("Charging")) {
+                    tagCompound.setBoolean("Charging", false);
+                }
+                if (!tagCompound.hasKey("Energy")) {
+                    tagCompound.setInteger("Energy", 0);
+                }
+                if (!tagCompound.hasKey("Fuel")) {
+                    NBTTagCompound fuelTagCompound = ItemStack.EMPTY.writeToNBT(new NBTTagCompound());
+                    tagCompound.setTag("Fuel", fuelTagCompound);
+                }
+                if (!tagCompound.hasKey("BurnTime")) {
+                    tagCompound.setInteger("BurnTime", 0);
+                }
+                if (!tagCompound.hasKey("Slot")) {
+                    tagCompound.setInteger("Slot", 0);
+                }
             }
             if (inventoryGenerator.isOn(stack)) {
                 EntityPlayer player = (EntityPlayer) entity;
                 if (inventoryGenerator.getBurnTime(stack) <= 0) {
                     FuelWithSlot fuelWithSlot = inventoryGenerator.getFuelWithSlot(player);
                     ItemStack fuel = fuelWithSlot.getFuel();
+                    addFuel(stack, fuel);
                     int slot = fuelWithSlot.getSlot();
                     inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
                     inventoryGenerator.setSlot(stack, slot);
@@ -113,7 +158,8 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
     @Override
     public void consumeItem(ItemStack stack, EntityPlayer player) {
         ItemStack fuel = getFuel(stack);
-        if (getBurnTime(stack) == 0 && !fuel.isEmpty() && getInternalEnergyStored(stack) < getMaxEnergyStored(stack)) {
+        InventoryGenerators.LOGGER.info("Fuel Is: " + fuel);
+        if (getBurnTime(stack) <= 0 && !fuel.isEmpty() && getInternalEnergyStored(stack) < getMaxEnergyStored(stack)) {
             addFuel(stack, fuel);
             int slot = getSlot(stack);
             ItemStack fuel2 = player.inventory.getStackInSlot(slot);
@@ -193,7 +239,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
 
     @Override
     public int calculatePower(ItemStack stack) {
-        return 0;
+        return Math.min(getMaxEnergyStored(stack) - getInternalEnergyStored(stack),  getSend());
     }
 
     @Override
@@ -311,7 +357,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
 
     @Override
     public int getMaxEnergyStored(ItemStack container) {
-        return 10000;
+        return 100000;
     }
 
     @Override

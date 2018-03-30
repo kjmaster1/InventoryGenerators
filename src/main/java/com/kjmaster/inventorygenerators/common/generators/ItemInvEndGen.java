@@ -1,34 +1,39 @@
 package com.kjmaster.inventorygenerators.common.generators;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class ItemInvCulinaryGen extends ItemInventoryGenerator {
+public class ItemInvEndGen extends ItemInventoryGenerator {
 
-    public ItemInvCulinaryGen() {
-        super("inv_culinary_gen");
+    public ItemInvEndGen() {
+        super("inv_end_gen");
     }
 
     @Override
     public boolean isItemValid(ItemStack stack) {
-        return stack.getItem() instanceof ItemFood;
+        Item item = stack.getItem();
+        return item.equals(Items.ENDER_PEARL) || item.equals(Items.ENDER_EYE);
     }
 
     @Override
     public int calculateTime(ItemStack stack) {
         if (!stack.isEmpty()) {
             Item item = stack.getItem();
-            ItemFood food = (ItemFood) item;
-            return (int) Math.ceil((food.getHealAmount(stack) * 10) * (getSaturation(food, stack) * 20));
+            if (item.equals(Items.ENDER_PEARL)) {
+                return 1600;
+            } else if (item.equals(Items.ENDER_EYE)) {
+                return 3200;
+            }
         }
         return 0;
     }
 
-    private float getSaturation(ItemFood food, ItemStack stack) {
-        return food.getSaturationModifier(stack) != 0 ? food.getSaturationModifier(stack) : 0.1F;
+    @Override
+    public int calculatePower(ItemStack stack) {
+        return Math.min(getMaxEnergyStored(stack) - getInternalEnergyStored(stack),  calculateTime(getFuel(stack)) / 40);
     }
 
     @Override
