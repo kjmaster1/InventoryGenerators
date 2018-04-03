@@ -2,8 +2,7 @@ package com.kjmaster.inventorygenerators.common.init;
 
 import com.kjmaster.inventorygenerators.InventoryGenerators;
 import com.kjmaster.inventorygenerators.client.IHasModel;
-import com.kjmaster.inventorygenerators.common.generators.ItemInvCulinaryGen;
-import com.kjmaster.inventorygenerators.common.generators.ItemInvEndGen;
+import com.kjmaster.inventorygenerators.common.generators.*;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -19,7 +18,31 @@ public class InitModGenerators {
 
     public static final Item invCulinaryGen = new ItemInvCulinaryGen();
 
+    public static final Item invDeathGen = new ItemInvDeathGen();
+
     public static final Item invEndGen = new ItemInvEndGen();
+
+    public static final Item invExplosiveGen = new ItemInvExplosiveGen();
+
+    public static final Item invFurnaceGen = new ItemInvFurnaceGen();
+
+    public static final Item invHalitosisGen = new ItemInvHalitosisGen();
+
+    public static final Item invFrostyGen = new ItemInvFrostyGen();
+
+    public static final Item invMagmaticGen = new ItemInvMagmaticGen();
+
+    public static final Item invNetherStarGen = new ItemInvNetherStarGen();
+
+    public static final Item invOverclockedGen = new ItemInvOverclockedGen();
+
+    public static final Item invPinkGen = new ItemInvPinkGen();
+
+    public static final Item invPotionGen = new ItemInvPotionGen();
+
+    public static final Item invSlimeyGen = new ItemInvSlimeyGen();
+
+    public static final Item invSurvivalistGen = new ItemInvSurvivalistGen();
 
     @Mod.EventBusSubscriber(modid = InventoryGenerators.MODID)
     public static class RegistrationHandler {
@@ -29,13 +52,24 @@ public class InitModGenerators {
         public static void registerItems(final RegistryEvent.Register<Item> event) {
             final Item[] items = {
                     invCulinaryGen,
+                    invDeathGen,
                     invEndGen,
+                    invExplosiveGen,
+                    invFurnaceGen,
+                    invHalitosisGen,
+                    invFrostyGen,
+                    invMagmaticGen,
+                    invNetherStarGen,
+                    invOverclockedGen,
+                    invPinkGen,
+                    invPotionGen,
+                    invSlimeyGen,
+                    invSurvivalistGen,
             };
             final IForgeRegistry<Item> registry = event.getRegistry();
             for (final Item item : items) {
                 registry.register(item);
                 ITEMS.add(item);
-
             }
         }
     }
@@ -44,7 +78,19 @@ public class InitModGenerators {
     public static void registerModels() {
         final Item[] items = {
                 invCulinaryGen,
+                invDeathGen,
                 invEndGen,
+                invExplosiveGen,
+                invFurnaceGen,
+                invHalitosisGen,
+                invFrostyGen,
+                invMagmaticGen,
+                invNetherStarGen,
+                invOverclockedGen,
+                invPinkGen,
+                invPotionGen,
+                invSlimeyGen,
+                invSurvivalistGen,
         };
 
         for (Item item : items) {

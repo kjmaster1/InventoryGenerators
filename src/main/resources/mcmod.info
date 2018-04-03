@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "modid": "inventorygenerators",
+  "name": "Inventory Generators",
+  "description": "Most of the extra utilities 2 generators in your inventory!",
+  "version": "1.0.0",
+  "mcversion": "1.12.2",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["kjmaster1"],
+  "credits": "RWTema for making extra utilities 2, Searge for running modjam and Igrek for the amazing art.",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

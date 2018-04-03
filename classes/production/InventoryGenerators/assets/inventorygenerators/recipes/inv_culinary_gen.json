@@ -1,0 +1,27 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_culinary_gen"
+  },
+  "pattern": [
+    "www",
+    "wpw",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"w": {
+		"type": "forge:ore_dict",
+		"ore": "cropWheat"
+    },
+	"p": {
+		"item": "minecraft:cooked_porkchop"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

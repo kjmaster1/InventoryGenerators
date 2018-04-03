@@ -1,0 +1,28 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_overclocked_gen"
+  },
+  "pattern": [
+    "lll",
+    "lgl",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"g": {
+		"type": "forge:ore_dict",
+		"ore": "blockGold"
+    },
+	"l": {
+		"type": "forge:ore_dict",
+		"ore": "gemLapis"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

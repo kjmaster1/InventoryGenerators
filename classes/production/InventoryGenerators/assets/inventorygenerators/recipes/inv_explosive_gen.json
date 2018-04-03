@@ -1,0 +1,27 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_explosive_gen"
+  },
+  "pattern": [
+    "ggg",
+    "gtg",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"g": {
+		"type": "forge:ore_dict",
+		"ore": "gunpowder"
+    },
+	"t": {
+		"item": "minecraft:tnt"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

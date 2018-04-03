@@ -1,0 +1,26 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_frosty_gen"
+  },
+  "pattern": [
+    "sss",
+    "sis",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"s": {
+		"item": "minecraft:snowball"
+    },
+	"i": {
+		"item": "minecraft:ice"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

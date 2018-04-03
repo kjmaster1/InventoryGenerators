@@ -1,0 +1,27 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_death_gen"
+  },
+  "pattern": [
+    "bbb",
+    "bsb",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"s": {
+		"item": "minecraft:spider_eye"
+    },
+	"b": {
+		"type": "forge:ore_dict",
+		"ore": "bone"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

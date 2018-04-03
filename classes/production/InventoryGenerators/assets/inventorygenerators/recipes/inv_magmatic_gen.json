@@ -1,0 +1,27 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_magmatic_gen"
+  },
+  "pattern": [
+    "ggg",
+    "glg",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"g": {
+		"type": "forge:ore_dict",
+		"ore": "ingotGold"
+    },
+	"l": {
+		"item": "minecraft:lava_bucket"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

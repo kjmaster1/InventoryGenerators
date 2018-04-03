@@ -45,5 +45,4 @@ public interface IInventoryGenerator {
 
     void giveEnergyToChargeables(ArrayList<ItemStack> chargeables, ItemStack stack);
 
-    void consumeItem(ItemStack stack, EntityPlayer player);
 }

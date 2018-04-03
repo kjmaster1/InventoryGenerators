@@ -1,0 +1,28 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_end_gen"
+  },
+  "pattern": [
+    "ppp",
+    "pop",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"o": {
+		"type": "forge:ore_dict",
+		"ore": "obsidian"
+    },
+	"p": {
+		"type": "forge:ore_dict",
+		"ore": "enderpearl"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

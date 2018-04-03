@@ -2,6 +2,7 @@ package com.kjmaster.inventorygenerators.common.generators;
 
 import com.kjmaster.inventorygenerators.InventoryGenerators;
 import com.kjmaster.inventorygenerators.client.IHasModel;
+import com.kjmaster.inventorygenerators.client.KeyHandler;
 import com.kjmaster.kjlib.common.energy.IItemEnergy;
 import com.kjmaster.kjlib.common.energy.InvEnergyStorage;
 import com.kjmaster.kjlib.common.items.ItemBase;
@@ -48,7 +49,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
         ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition() {
             @Override
             public ModelResourceLocation getModelLocation(ItemStack stack) {
-                if (isOn(stack)) {
+                if (isOn(stack) && getBurnTime(stack) > 0) {
                     return onModel;
                 } else {
                     return offModel;
@@ -84,14 +85,17 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             }
             if (inventoryGenerator.isOn(stack)) {
                 EntityPlayer player = (EntityPlayer) entity;
-                if (inventoryGenerator.getBurnTime(stack) <= 0) {
+                if ((inventoryGenerator.getBurnTime(stack) <= 0 || getFuel(stack).isEmpty())
+                        && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
+                    setBurnTime(stack, 0);
                     FuelWithSlot fuelWithSlot = inventoryGenerator.getFuelWithSlot(player);
                     ItemStack fuel = fuelWithSlot.getFuel();
                     addFuel(stack, fuel);
                     int slot = fuelWithSlot.getSlot();
                     inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
                     inventoryGenerator.setSlot(stack, slot);
-                } else {
+                    fuel.shrink(1);
+                } else if (!(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
                     inventoryGenerator.setBurnTime(stack, inventoryGenerator.getBurnTime(stack) - 1);
                     int rfToGive = inventoryGenerator.calculatePower(stack);
                     inventoryGenerator.receiveInternalEnergy(stack, rfToGive);
@@ -101,7 +105,6 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
                     ArrayList<ItemStack> chargeables = inventoryGenerator.getChargeables(player);
                     inventoryGenerator.giveEnergyToChargeables(chargeables, stack);
                 }
-                inventoryGenerator.consumeItem(stack, player);
             }
         }
     }
@@ -138,36 +141,26 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
         if (StringHelper.displayShiftForDetail && !StringHelper.isShiftKeyDown()) {
             tooltip.add(StringHelper.shiftForDetails());
         }
-        if (!StringHelper.isShiftKeyDown()) {
-            return;
-        }
-        tooltip.add(StringHelper.getInfoText("info.invgens.0"));
+    }
 
-        if (isInChargingMode(stack)) {
+    public void addMoreInformation(ItemStack stack, List<String> tooltip) {
+        if (isOn(stack)) {
             tooltip.add(StringHelper.getNoticeText("info.invgens.1"));
             tooltip.add(StringHelper.getDeactivationText("info.invgens.2"));
         } else {
             tooltip.add(StringHelper.getActivationText("info.invgens.3"));
         }
 
+        if (isInChargingMode(stack)) {
+            tooltip.add(StringHelper.getNoticeText("info.invgens.modeOn"));
+        } else {
+            tooltip.add(StringHelper.getNoticeText("info.invgens.modeOff"));
+        }
+
+        tooltip.add(StringHelper.localizeFormat("info.invgens.mode", StringHelper.getKeyName(KeyHandler.MODE_KEY.getKeyCode())));
         tooltip.add(StringHelper.localize("info.invgens.charge") + ": " + StringHelper.getScaledNumber(getInternalEnergyStored(stack)) + " / " + StringHelper.getScaledNumber(getMaxEnergyStored(stack)) + " RF");
         tooltip.add(StringHelper.localize("info.invgens.send") + "/" + StringHelper.localize("info.invgens.receive") + ": " + StringHelper.formatNumber(getSend()) + "/" + StringHelper.formatNumber(getReceive()) + " RF/t");
         tooltip.add(StringHelper.localize("info.invgens.burnTimeLeft") + ": " + StringHelper.formatNumber(getBurnTime(stack)));
-    }
-
-    @Override
-    public void consumeItem(ItemStack stack, EntityPlayer player) {
-        ItemStack fuel = getFuel(stack);
-        InventoryGenerators.LOGGER.info("Fuel Is: " + fuel);
-        if (getBurnTime(stack) <= 0 && !fuel.isEmpty() && getInternalEnergyStored(stack) < getMaxEnergyStored(stack)) {
-            addFuel(stack, fuel);
-            int slot = getSlot(stack);
-            ItemStack fuel2 = player.inventory.getStackInSlot(slot);
-            if (ItemStack.areItemStacksEqual(fuel, fuel2)) {
-                fuel2.shrink(1);
-                fuel.shrink(1);
-            }
-        }
     }
 
     @Override

@@ -1,0 +1,28 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_pink_gen"
+  },
+  "pattern": [
+    "ppp",
+    "pwp",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"p": {
+		"type": "forge:ore_dict",
+		"ore": "dyePink"
+    },
+	"w": {
+		"item": "minecraft:wool",
+		"data": 6
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

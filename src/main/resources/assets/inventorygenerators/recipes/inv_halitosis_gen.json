@@ -1,0 +1,26 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_halitosis_gen"
+  },
+  "pattern": [
+    "ppp",
+    "pep",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"p": {
+		"item": "minecraft:purpur_block"
+    },
+	"e": {
+		"item": "minecraft:end_rod"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

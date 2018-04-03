@@ -1,0 +1,28 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_survivalist_gen"
+  },
+  "pattern": [
+    "sss",
+    "sis",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "blockRedstone"
+    },
+	"i": {
+		"type": "forge:ore_dict",
+		"ore": "ingotIron"
+    },
+	"f": {
+		"item": "minecraft:furnace"
+	},
+	"s": {
+		"type": "forge:ore_dict",
+		"ore": "cobblestone"
+	}
+  }
+}

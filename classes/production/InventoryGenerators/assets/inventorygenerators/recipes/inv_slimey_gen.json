@@ -1,0 +1,28 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_slimey_gen"
+  },
+  "pattern": [
+    "sss",
+    "sbs",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"s": {
+		"type": "forge:ore_dict",
+		"ore": "slimeball"
+    },
+	"b": {
+		"type": "forge:ore_dict",
+		"ore": "blockSlime"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

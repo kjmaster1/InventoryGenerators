@@ -1,0 +1,27 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_nether_star_gen"
+  },
+  "pattern": [
+    "www",
+    "wnw",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"w": {
+		"item": "minecraft:skull",
+		"data": 1
+    },
+	"n": {
+		"item": "minecraft:nether_star"
+	},
+	"f": {
+		"item": "inventorygenerators:inv_furnace_gen"
+	}
+  }
+}

@@ -1,15 +1,30 @@
 package com.kjmaster.inventorygenerators.common.generators;
 
+import com.kjmaster.kjlib.utils.StringHelper;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
 public class ItemInvCulinaryGen extends ItemInventoryGenerator {
 
     public ItemInvCulinaryGen() {
         super("inv_culinary_gen");
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        if (!StringHelper.isShiftKeyDown()) {
+            return;
+        }
+        tooltip.add(StringHelper.getInfoText("info.invgens.culinary"));
+        addMoreInformation(stack, tooltip);
     }
 
     @Override

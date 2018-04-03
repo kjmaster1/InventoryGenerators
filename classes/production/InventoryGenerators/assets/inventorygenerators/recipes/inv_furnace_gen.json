@@ -1,0 +1,27 @@
+{
+  "result": {
+    "item": "inventorygenerators:inv_furnace_gen"
+  },
+  "pattern": [
+    "iii",
+    "isi",
+    "rfr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"i": {
+		"type": "forge:ore_dict",
+		"ore": "ingotIron"
+    },
+	"f": {
+		"item": "minecraft:furnace"
+	},
+	"s": {
+		"item": "inventorygenerators:inv_survivalist_gen"
+	}
+  }
+}
