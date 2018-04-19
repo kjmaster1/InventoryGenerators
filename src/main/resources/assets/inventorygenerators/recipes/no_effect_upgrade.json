@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "inventorygenerators:no_effect_upgrade"
+  },
+  "pattern": [
+    "gbg",
+    "rrr",
+    "rrr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"b": {
+		"item": "minecraft:glass_bottle"
+    },
+	"g": {
+		"type": "forge:ore_dict",
+		"ore": "ingotGold"
+	}
+  }
+}
