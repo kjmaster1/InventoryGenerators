@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "inventorygenerators:auto_pull_upgrade"
+  },
+  "pattern": [
+    "ghg",
+    "rrr",
+    "rrr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"h": {
+		"item": "minecraft:hopper"
+    },
+	"g": {
+		"type": "forge:ore_dict",
+		"ore": "ingotGold"
+	}
+  }
+}

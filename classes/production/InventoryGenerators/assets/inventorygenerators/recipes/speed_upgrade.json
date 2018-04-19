@@ -1,0 +1,24 @@
+{
+  "result": {
+    "item": "inventorygenerators:speed_upgrade"
+  },
+  "pattern": [
+    "gsg",
+    "rrr",
+    "rrr"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "r": {
+		"type": "forge:ore_dict",
+		"ore": "dustRedstone"
+    },
+	"s": {
+		"item": "minecraft:sugar"
+    },
+	"g": {
+		"type": "forge:ore_dict",
+		"ore": "ingotGold"
+	}
+  }
+}

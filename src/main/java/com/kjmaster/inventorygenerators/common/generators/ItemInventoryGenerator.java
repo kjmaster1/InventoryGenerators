@@ -3,6 +3,7 @@ package com.kjmaster.inventorygenerators.common.generators;
 import com.kjmaster.inventorygenerators.InventoryGenerators;
 import com.kjmaster.inventorygenerators.client.IHasModel;
 import com.kjmaster.inventorygenerators.client.KeyHandler;
+import com.kjmaster.inventorygenerators.common.init.InitModGenerators;
 import com.kjmaster.kjlib.common.energy.IItemEnergy;
 import com.kjmaster.kjlib.common.energy.InvEnergyStorage;
 import com.kjmaster.kjlib.common.items.ItemBase;
@@ -14,7 +15,9 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -23,12 +26,18 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,66 +68,55 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
     }
 
     @Override
+    public void onCreated(ItemStack stack, World world, EntityPlayer player) {}
+
+    @Override
     public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-        if (entity instanceof EntityPlayer && !world.isRemote && stack.getItem() instanceof IInventoryGenerator) {
+        if (entity instanceof EntityPlayer && !world.isRemote) {
             IInventoryGenerator inventoryGenerator = (IInventoryGenerator) stack.getItem();
-            if (!stack.hasTagCompound()) {
-                inventoryGenerator.giveTagCompound(stack);
-            }  else if (stack.hasTagCompound()) {
-                NBTTagCompound tagCompound = stack.getTagCompound();
-                if (!tagCompound.hasKey("Charging")) {
-                    tagCompound.setBoolean("Charging", false);
-                }
-                if (!tagCompound.hasKey("Energy")) {
-                    tagCompound.setInteger("Energy", 0);
-                }
-                if (!tagCompound.hasKey("Fuel")) {
-                    NBTTagCompound fuelTagCompound = ItemStack.EMPTY.writeToNBT(new NBTTagCompound());
-                    tagCompound.setTag("Fuel", fuelTagCompound);
-                }
-                if (!tagCompound.hasKey("BurnTime")) {
-                    tagCompound.setInteger("BurnTime", 0);
-                }
-                if (!tagCompound.hasKey("Slot")) {
-                    tagCompound.setInteger("Slot", 0);
-                }
-            }
             if (inventoryGenerator.isOn(stack)) {
                 EntityPlayer player = (EntityPlayer) entity;
-                if ((inventoryGenerator.getBurnTime(stack) <= 0 || getFuel(stack).isEmpty())
-                        && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
-                    setBurnTime(stack, 0);
-                    FuelWithSlot fuelWithSlot = inventoryGenerator.getFuelWithSlot(player);
-                    ItemStack fuel = fuelWithSlot.getFuel();
-                    addFuel(stack, fuel);
-                    int slot = fuelWithSlot.getSlot();
-                    inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
-                    inventoryGenerator.setSlot(stack, slot);
-                    fuel.shrink(1);
-                } else if (!(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
-                    inventoryGenerator.setBurnTime(stack, inventoryGenerator.getBurnTime(stack) - 1);
-                    int rfToGive = inventoryGenerator.calculatePower(stack);
-                    inventoryGenerator.receiveInternalEnergy(stack, rfToGive);
+                IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                ItemStack speedUpgradeStack = inv.getStackInSlot(1);
+                int numSpeedUpgrades = speedUpgradeStack.getCount();
+                for (int i = 0; i <= numSpeedUpgrades; i++) {
+                    if ((inventoryGenerator.getBurnTime(stack) <= 0 || getFuel(stack).isEmpty())
+                            && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
+                        setBurnTime(stack, 0);
+                        ItemStack fuel = getFuel(stack);
+                        inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
+                        fuel.shrink(1);
+                    } else if (!(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
+                        inventoryGenerator.setBurnTime(stack, inventoryGenerator.getBurnTime(stack) - 1);
+                        int rfToGive = inventoryGenerator.calculatePower(stack);
+                        inventoryGenerator.receiveInternalEnergy(stack, rfToGive);
 
+                    }
+                    if (inventoryGenerator.isInChargingMode(stack)) {
+                        ArrayList<ItemStack> chargeables = inventoryGenerator.getChargeables(player);
+                        inventoryGenerator.giveEnergyToChargeables(chargeables, stack);
+                    }
                 }
-                if (inventoryGenerator.isInChargingMode(stack)) {
-                    ArrayList<ItemStack> chargeables = inventoryGenerator.getChargeables(player);
-                    inventoryGenerator.giveEnergyToChargeables(chargeables, stack);
+                if (inv.getStackInSlot(3).isEmpty() && hasSideEffect()) {
+                    giveSideEffect(player);
                 }
             }
         }
     }
 
+    public void giveSideEffect(EntityPlayer player) {}
+
+    public boolean hasSideEffect() {
+        return false;
+    }
+
     @Override
     public void giveTagCompound(ItemStack stack) {
         NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        NBTTagCompound fuelTagCompound = ItemStack.EMPTY.writeToNBT(new NBTTagCompound());
-        nbtTagCompound.setTag("Fuel", fuelTagCompound);
         nbtTagCompound.setBoolean("On", false);
         nbtTagCompound.setBoolean("Charging", false);
         nbtTagCompound.setInteger("Energy", 0);
         nbtTagCompound.setInteger("BurnTime", 0);
-        nbtTagCompound.setInteger("Slot", 0);
         stack.setTagCompound(nbtTagCompound);
     }
 
@@ -133,7 +131,82 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
     @Nullable
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
-        return new InvEnergyStorage(getMaxEnergyStored(stack), getReceive(), getSend(), stack, this);
+        return new InvEnergyProvider(stack, this);
+    }
+
+    private class InvEnergyProvider implements ICapabilitySerializable<NBTBase> {
+
+        private final IItemHandler inv;
+        private final InvEnergyStorage energyStorage;
+
+        InvEnergyProvider(ItemStack stack, IItemEnergy iItemEnergy) {
+            this.energyStorage =  new InvEnergyStorage(getMaxEnergyStored(stack), getReceive(), getSend(), stack, iItemEnergy);
+            this.inv = new ItemStackHandler(4) {
+
+                @Nonnull
+                @Override
+                public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+
+                    Item item = stack.getItem();
+                    boolean isSpeedUpgrade = item.equals(InitModGenerators.speedUpgrade);
+                    boolean isAutoPullUpgrade = item.equals(InitModGenerators.autoPullUpgrade);
+                    boolean isNoEffectUpgrade = item.equals(InitModGenerators.noEffectUpgrade);
+                    if (slot == 0 && !stack.isEmpty() && ItemInventoryGenerator.this.isItemValid(stack)) {
+                        return super.insertItem(slot, stack, simulate);
+                    }
+                    if (slot == 1 && !stack.isEmpty() && isSpeedUpgrade) {
+                        return super.insertItem(slot, stack, simulate);
+                    }
+                    if (slot == 2 && !stack.isEmpty() && isAutoPullUpgrade) {
+                        return super.insertItem(slot, stack, simulate);
+                    }
+                    if (slot == 3 && !stack.isEmpty() && isNoEffectUpgrade) {
+                        return super.insertItem(slot, stack, simulate);
+                    }
+                    return stack;
+                }
+            };
+        }
+
+        @Override
+        public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
+            return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || energyStorage.hasCapability(capability, facing);
+        }
+
+        @Override
+        public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+            if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(inv);
+            if(capability == CapabilityEnergy.ENERGY) {
+                return CapabilityEnergy.ENERGY.cast(energyStorage);
+            }
+            else return null;
+        }
+
+        @Override
+        public NBTBase serializeNBT() {
+            NBTBase nbtBase = CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inv, null);
+            NBTBase nbtBase1 = energyStorage.serializeNBT();
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setTag("EnergyStorage", nbtBase1);
+            if (nbtBase != null) {
+                nbtTagCompound.setTag("Inv", nbtBase);
+            }
+            return nbtTagCompound;
+        }
+
+        @Override
+        public void deserializeNBT(NBTBase nbt) {
+            NBTTagCompound nbtTagCompound = (NBTTagCompound) nbt;
+            if (nbtTagCompound.hasKey("EnergyStorage")) {
+                NBTBase nbtBase1 = nbtTagCompound.getTag("EnergyStorage");
+                energyStorage.deserializeNBT(nbtBase1);
+            }
+            if (nbtTagCompound.hasKey("Inv")) {
+                NBTBase nbtBase = nbtTagCompound.getTag("Inv");
+                CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(inv, null, nbtBase);
+            }
+        }
     }
 
     @Override
@@ -157,9 +230,14 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             tooltip.add(StringHelper.getNoticeText("info.invgens.modeOff"));
         }
 
+        IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        ItemStack speedUpgradesStack = inv.getStackInSlot(1);
+        int numSpeedUpgrades = speedUpgradesStack.getCount();
         tooltip.add(StringHelper.localizeFormat("info.invgens.mode", StringHelper.getKeyName(KeyHandler.MODE_KEY.getKeyCode())));
-        tooltip.add(StringHelper.localize("info.invgens.charge") + ": " + StringHelper.getScaledNumber(getInternalEnergyStored(stack)) + " / " + StringHelper.getScaledNumber(getMaxEnergyStored(stack)) + " RF");
-        tooltip.add(StringHelper.localize("info.invgens.send") + "/" + StringHelper.localize("info.invgens.receive") + ": " + StringHelper.formatNumber(getSend()) + "/" + StringHelper.formatNumber(getReceive()) + " RF/t");
+        tooltip.add(StringHelper.localize("info.invgens.charge") + ": " + StringHelper.getScaledNumber(getInternalEnergyStored(stack))
+                + " / " + StringHelper.getScaledNumber(getMaxEnergyStored(stack)) + " RF");
+        tooltip.add(StringHelper.localize("info.invgens.send") + "/" + StringHelper.localize("info.invgens.receive")
+                + ": " + StringHelper.formatNumber(getSend()) + "/" + StringHelper.formatNumber(getReceive()) + " RF/t" + " * " + StringHelper.formatNumber(numSpeedUpgrades + 1));
         tooltip.add(StringHelper.localize("info.invgens.burnTimeLeft") + ": " + StringHelper.formatNumber(getBurnTime(stack)));
     }
 
@@ -194,7 +272,13 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
                 int stored = getInternalEnergyStored(stack);
                 int newEnergy = stored + energy;
                 nbtTagCompound.setInteger("Energy", newEnergy);
+            } else {
+                nbtTagCompound.setInteger("Energy", 0);
             }
+        } else {
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setInteger("Energy", 0);
+            stack.writeToNBT(nbtTagCompound);
         }
     }
 
@@ -204,20 +288,15 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             NBTTagCompound tagCompound = stack.getTagCompound();
             if (tagCompound.hasKey("Energy")) {
                 return tagCompound.getInteger("Energy");
+            } else {
+                tagCompound.setInteger("Energy", 0);
             }
+        } else {
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setInteger("Energy", 0);
+            stack.writeToNBT(nbtTagCompound);
         }
         return 0;
-    }
-
-    @Override
-    public FuelWithSlot getFuelWithSlot(EntityPlayer player) {
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack stack = player.inventory.getStackInSlot(i);
-            if (isItemValid(stack)) {
-                return new FuelWithSlot(stack, i);
-            }
-        }
-        return new FuelWithSlot(ItemStack.EMPTY, 0);
     }
 
     @Override
@@ -241,7 +320,13 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             NBTTagCompound nbtTagCompound = stack.getTagCompound();
             if (nbtTagCompound.hasKey("Charging")) {
                 return nbtTagCompound.getBoolean("Charging");
+            } else {
+                nbtTagCompound.setBoolean("Charging", false);
             }
+        } else {
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setBoolean("Charging", false);
+            stack.writeToNBT(nbtTagCompound);
         }
         return false;
     }
@@ -255,6 +340,10 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             if (stack.hasTagCompound()) {
                 NBTTagCompound tagCompound = stack.getTagCompound();
                 tagCompound.setBoolean("Charging", true);
+            } else {
+                NBTTagCompound nbtTagCompound = new NBTTagCompound();
+                nbtTagCompound.setBoolean("Charging", false);
+                stack.writeToNBT(nbtTagCompound);
             }
         }
     }
@@ -265,7 +354,13 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             NBTTagCompound nbtTagCompound = stack.getTagCompound();
             if (nbtTagCompound.hasKey("On")) {
                 return nbtTagCompound.getBoolean("On");
+            } else {
+                nbtTagCompound.setBoolean("On", false);
             }
+        } else {
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setBoolean("On", false);
+            stack.writeToNBT(nbtTagCompound);
         }
         return false;
     }
@@ -279,6 +374,10 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             if (stack.hasTagCompound()) {
                 NBTTagCompound tagCompound = stack.getTagCompound();
                 tagCompound.setBoolean("On", true);
+            } else {
+                NBTTagCompound nbtTagCompound = new NBTTagCompound();
+                nbtTagCompound.setBoolean("On", false);
+                stack.writeToNBT(nbtTagCompound);
             }
         }
     }
@@ -289,7 +388,13 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             NBTTagCompound nbtTagCompound = stack.getTagCompound();
             if (nbtTagCompound.hasKey("BurnTime")) {
                 return nbtTagCompound.getInteger("BurnTime");
+            } else {
+                nbtTagCompound.setInteger("BurnTime", 0);
             }
+        } else {
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setInteger("BurnTime", 0);
+            stack.writeToNBT(nbtTagCompound);
         }
         return 0;
     }
@@ -300,52 +405,20 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             NBTTagCompound nbtTagCompound = stack.getTagCompound();
             if (nbtTagCompound.hasKey("BurnTime")) {
                 nbtTagCompound.setInteger("BurnTime", burnTime);
+            } else {
+                nbtTagCompound.setInteger("BurnTime", 0);
             }
+        } else {
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            nbtTagCompound.setInteger("BurnTime", 0);
+            stack.writeToNBT(nbtTagCompound);
         }
     }
 
     @Override
     public ItemStack getFuel(ItemStack stack) {
-        if (stack.hasTagCompound()) {
-            NBTTagCompound nbtTagCompound = stack.getTagCompound();
-            if (nbtTagCompound.hasKey("Fuel")) {
-                NBTTagCompound fuelTagCompound = nbtTagCompound.getCompoundTag("Fuel");
-                return new ItemStack(fuelTagCompound);
-            }
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void addFuel(ItemStack stack, ItemStack fuel) {
-        if (stack.hasTagCompound()) {
-            NBTTagCompound nbtTagCompound = stack.getTagCompound();
-            if (nbtTagCompound.hasKey("Fuel")) {
-                NBTTagCompound fuelTagCompound = fuel.writeToNBT(new NBTTagCompound());
-                nbtTagCompound.setTag("Fuel", fuelTagCompound);
-            }
-        }
-    }
-
-    @Override
-    public int getSlot(ItemStack stack) {
-        if (stack.hasTagCompound()) {
-            NBTTagCompound nbtTagCompound = stack.getTagCompound();
-            if (nbtTagCompound.hasKey("Slot")) {
-                return nbtTagCompound.getInteger("Slot");
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public void setSlot(ItemStack stack, int slot) {
-        if (stack.hasTagCompound()) {
-            NBTTagCompound nbtTagCompound = stack.getTagCompound();
-            if (nbtTagCompound.hasKey("Slot")) {
-                nbtTagCompound.setInteger("Slot", slot);
-            }
-        }
+        IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        return inv.getStackInSlot(0);
     }
 
     @Override
@@ -360,7 +433,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
 
     @Override
     public int extractEnergy(ItemStack container, int maxExtract, boolean simulate) {
-        if (container.getTagCompound() == null) {
+        if (!container.hasTagCompound()) {
             NBTTagCompound newTagCompound = new NBTTagCompound();
             newTagCompound.setInteger("Energy", 0);
             container.setTagCompound(newTagCompound);

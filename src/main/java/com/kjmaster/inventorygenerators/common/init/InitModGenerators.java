@@ -3,6 +3,9 @@ package com.kjmaster.inventorygenerators.common.init;
 import com.kjmaster.inventorygenerators.InventoryGenerators;
 import com.kjmaster.inventorygenerators.client.IHasModel;
 import com.kjmaster.inventorygenerators.common.generators.*;
+import com.kjmaster.inventorygenerators.common.upgrades.ItemAutoPullUpgrade;
+import com.kjmaster.inventorygenerators.common.upgrades.ItemNoEffectUpgrade;
+import com.kjmaster.inventorygenerators.common.upgrades.ItemSpeedUpgrade;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -44,6 +47,12 @@ public class InitModGenerators {
 
     public static final Item invSurvivalistGen = new ItemInvSurvivalistGen();
 
+    public static final Item autoPullUpgrade = new ItemAutoPullUpgrade();
+
+    public static final Item noEffectUpgrade = new ItemNoEffectUpgrade();
+
+    public static final Item speedUpgrade = new ItemSpeedUpgrade();
+
     @Mod.EventBusSubscriber(modid = InventoryGenerators.MODID)
     public static class RegistrationHandler {
         public static final Set<Item> ITEMS = new HashSet<>();
@@ -65,6 +74,9 @@ public class InitModGenerators {
                     invPotionGen,
                     invSlimeyGen,
                     invSurvivalistGen,
+                    autoPullUpgrade,
+                    noEffectUpgrade,
+                    speedUpgrade,
             };
             final IForgeRegistry<Item> registry = event.getRegistry();
             for (final Item item : items) {
@@ -91,6 +103,9 @@ public class InitModGenerators {
                 invPotionGen,
                 invSlimeyGen,
                 invSurvivalistGen,
+                autoPullUpgrade,
+                noEffectUpgrade,
+                speedUpgrade,
         };
 
         for (Item item : items) {

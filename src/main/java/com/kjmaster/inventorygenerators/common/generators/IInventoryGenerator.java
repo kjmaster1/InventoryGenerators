@@ -9,8 +9,6 @@ public interface IInventoryGenerator {
 
     void giveTagCompound(ItemStack stack);
 
-    FuelWithSlot getFuelWithSlot(EntityPlayer player);
-
     boolean isItemValid(ItemStack stack);
 
     int calculatePower(ItemStack stack);
@@ -30,12 +28,6 @@ public interface IInventoryGenerator {
     void setBurnTime(ItemStack stack, int burnTime);
 
     ItemStack getFuel(ItemStack stack);
-
-    void addFuel(ItemStack stack, ItemStack fuel);
-
-    int getSlot(ItemStack stack);
-
-    void setSlot(ItemStack stack, int slot);
 
     void receiveInternalEnergy(ItemStack stack, int energy);
 
