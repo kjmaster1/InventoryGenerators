@@ -68,21 +68,26 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
     }
 
     @Override
-    public void onCreated(ItemStack stack, World world, EntityPlayer player) {}
+    public void onCreated(ItemStack stack, World world, EntityPlayer player) {
+    }
+
+
 
     @Override
     public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof EntityPlayer && !world.isRemote) {
             IInventoryGenerator inventoryGenerator = (IInventoryGenerator) stack.getItem();
+            if (!stack.hasTagCompound()) {
+                giveTagCompound(stack);
+            }
             if (inventoryGenerator.isOn(stack)) {
                 EntityPlayer player = (EntityPlayer) entity;
                 IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
                 ItemStack speedUpgradeStack = inv.getStackInSlot(1);
                 int numSpeedUpgrades = speedUpgradeStack.getCount();
                 for (int i = 0; i <= numSpeedUpgrades; i++) {
-                    if ((inventoryGenerator.getBurnTime(stack) <= 0 || getFuel(stack).isEmpty())
+                    if (inventoryGenerator.getBurnTime(stack) <= 0 && (getFuel(stack).isEmpty() || getFuel(stack).getCount() == 1)
                             && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
-                        setBurnTime(stack, 0);
                         ItemStack fuel = getFuel(stack);
                         inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
                         fuel.shrink(1);
@@ -188,7 +193,9 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             NBTBase nbtBase = CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inv, null);
             NBTBase nbtBase1 = energyStorage.serializeNBT();
             NBTTagCompound nbtTagCompound = new NBTTagCompound();
-            nbtTagCompound.setTag("EnergyStorage", nbtBase1);
+            if (nbtBase1 != null) {
+                nbtTagCompound.setTag("EnergyStorage", nbtBase1);
+            }
             if (nbtBase != null) {
                 nbtTagCompound.setTag("Inv", nbtBase);
             }
@@ -333,7 +340,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
 
     @Override
     public void changeMode(ItemStack stack) {
-        if (isInChargingMode(stack)) {
+        if (isInChargingMode(stack) && stack.hasTagCompound()) {
             NBTTagCompound nbtTagCompound = stack.getTagCompound();
             nbtTagCompound.setBoolean("Charging", false);
         } else {
@@ -367,7 +374,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
 
     @Override
     public void turnOn(ItemStack stack) {
-        if (isOn(stack)) {
+        if (isOn(stack) && stack.hasTagCompound()) {
             NBTTagCompound nbtTagCompound = stack.getTagCompound();
             nbtTagCompound.setBoolean("On", false);
         } else {

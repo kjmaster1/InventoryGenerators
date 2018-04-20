@@ -39,7 +39,7 @@ public class ItemInvFurnaceGen extends ItemInventoryGenerator {
 
     @Override
     public int calculateTime(ItemStack stack) {
-        return (int) Math.ceil(TileEntityFurnace.getItemBurnTime(stack) / 4);
+        return (int) Math.ceil(TileEntityFurnace.getItemBurnTime(stack) / 16);
     }
 
     @Override

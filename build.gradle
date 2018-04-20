@@ -46,7 +46,7 @@ repositories {
 
 dependencies {
     compile files(
-            'kjlib-1.0.3-deobf.jar'
+            'kjlib-1.0.4-deobf.jar'
     )
 
     deobfCompile "mezz.jei:jei_1.12.2:+"
