@@ -80,6 +80,9 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             if (!stack.hasTagCompound()) {
                 giveTagCompound(stack);
             }
+            if (inventoryGenerator.getBurnTime(stack) < 0) {
+                inventoryGenerator.setBurnTime(stack, 0);
+            }
             if (inventoryGenerator.isOn(stack)) {
                 EntityPlayer player = (EntityPlayer) entity;
                 IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
@@ -91,7 +94,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
                         ItemStack fuel = getFuel(stack);
                         inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
                         fuel.shrink(1);
-                    } else if (!(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
+                    } else if (!(getInternalEnergyStored(stack) == getMaxEnergyStored(stack)) && inventoryGenerator.getBurnTime(stack) > 0) {
                         inventoryGenerator.setBurnTime(stack, inventoryGenerator.getBurnTime(stack) - 1);
                         int rfToGive = inventoryGenerator.calculatePower(stack);
                         inventoryGenerator.receiveInternalEnergy(stack, rfToGive);
