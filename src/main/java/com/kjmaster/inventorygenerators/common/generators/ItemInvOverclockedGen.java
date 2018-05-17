@@ -48,7 +48,6 @@ public class ItemInvOverclockedGen extends ItemInventoryGenerator {
     @Override
     public int calculatePower(ItemStack stack) {
         int minSend = TileEntityFurnace.getItemBurnTime(getFuel(stack)) < 4000 ? TileEntityFurnace.getItemBurnTime(getFuel(stack)) : 4000;
-        InventoryGenerators.LOGGER.info("minSend: " + minSend);
         return Math.min(getMaxEnergyStored(stack) - getInternalEnergyStored(stack),  minSend);
     }
 

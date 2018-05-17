@@ -86,8 +86,8 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
                 ItemStack speedUpgradeStack = inv.getStackInSlot(1);
                 int numSpeedUpgrades = speedUpgradeStack.getCount();
                 for (int i = 0; i <= numSpeedUpgrades; i++) {
-                    if (inventoryGenerator.getBurnTime(stack) <= 0 && (getFuel(stack).isEmpty() || getFuel(stack).getCount() == 1)
-                            && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
+                    if (inventoryGenerator.getBurnTime(stack) <= 0 && !inventoryGenerator.getFuel(stack).isEmpty()
+                        && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
                         ItemStack fuel = getFuel(stack);
                         inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
                         fuel.shrink(1);

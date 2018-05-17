@@ -32,11 +32,7 @@ public class EventHandler {
                     IInventoryGenerator generator = (IInventoryGenerator) item;
                     IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
                     ItemStack autoPullStack = inv.getStackInSlot(2);
-                    InventoryGenerators.LOGGER.info("Auto Pull Stack: " + autoPullStack.toString());
                     if (!autoPullStack.isEmpty() && generator.isItemValid(event.getItem().getItem())) {
-                        ItemStack stackInGenerator = inv.getStackInSlot(0);
-                        InventoryGenerators.LOGGER.info("Stack In Generator: " + stackInGenerator.toString());
-
                         ItemStack result = inv.insertItem(0, event.getItem().getItem(), false);
                         int numPickedUp = event.getItem().getItem().getCount() - result.getCount();
 
