@@ -31,7 +31,7 @@ public class ItemAutoPullUpgrade extends ItemBase implements IHasModel {
             tooltip.add(StringHelper.shiftForDetails());
         }
         else {
-            tooltip.add(StringHelper.getInfoText("info.invgens.autopullupgrade"));
+            tooltip.add(StringHelper.getInfoText("info.invgens.auto_pull_upgrade"));
         }
     }
 }

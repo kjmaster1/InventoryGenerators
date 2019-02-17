@@ -13,9 +13,9 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class ContainerGenerator extends Container {
 
-    private final IItemHandler inv;
+    private final InventoryGenerator inv;
 
-    public ContainerGenerator(InventoryPlayer playerInv, IItemHandler inv) {
+    public ContainerGenerator(InventoryPlayer playerInv, InventoryGenerator inv) {
         this.inv = inv;
 
         int i;
@@ -37,7 +37,7 @@ public class ContainerGenerator extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return !player.isSpectator();
+        return !player.isSpectator() && player.getHeldItemMainhand() == inv.generator;
     }
 
     @Override

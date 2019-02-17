@@ -31,7 +31,7 @@ public class ItemNoEffectUpgrade extends ItemBase implements IHasModel {
             tooltip.add(StringHelper.shiftForDetails());
         }
         else {
-            tooltip.add(StringHelper.getInfoText("info.invgens.noeffectupgrade"));
+            tooltip.add(StringHelper.getInfoText("info.invgens.no_effect_upgrade"));
         }
     }
 }

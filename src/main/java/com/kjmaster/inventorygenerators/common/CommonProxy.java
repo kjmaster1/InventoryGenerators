@@ -1,8 +1,7 @@
 package com.kjmaster.inventorygenerators.common;
 
 import com.kjmaster.inventorygenerators.common.handlers.ChangeModeHandler;
-import com.kjmaster.inventorygenerators.common.network.ChangeModePacket;
-import com.kjmaster.inventorygenerators.common.network.PacketInstance;
+import com.kjmaster.inventorygenerators.common.network.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;

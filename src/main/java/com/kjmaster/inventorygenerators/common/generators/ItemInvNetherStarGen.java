@@ -41,7 +41,7 @@ public class ItemInvNetherStarGen extends ItemInventoryGenerator {
         if (!StringHelper.isShiftKeyDown()) {
             return;
         }
-        tooltip.add(StringHelper.getInfoText("info.invgens.netherstar"));
+        tooltip.add(StringHelper.getInfoText("info.invgens.nether_star"));
         addMoreInformation(stack, tooltip);
     }
 

@@ -14,7 +14,7 @@ public class GuiGenerator extends GuiContainer {
 
     private final String name;
 
-    public GuiGenerator(InventoryPlayer playerInv, IItemHandler inv, String name) {
+    public GuiGenerator(InventoryPlayer playerInv, InventoryGenerator inv, String name) {
         super(new ContainerGenerator(playerInv, inv));
         this.name = name;
     }

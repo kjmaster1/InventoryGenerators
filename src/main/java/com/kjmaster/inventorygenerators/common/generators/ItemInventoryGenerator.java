@@ -35,6 +35,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -72,7 +73,6 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
     }
 
 
-
     @Override
     public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof EntityPlayer && !world.isRemote) {
@@ -86,11 +86,14 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
             if (inventoryGenerator.isOn(stack)) {
                 EntityPlayer player = (EntityPlayer) entity;
                 IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                if (inv == null) {
+                    return;
+                }
                 ItemStack speedUpgradeStack = inv.getStackInSlot(1);
                 int numSpeedUpgrades = speedUpgradeStack.getCount();
                 for (int i = 0; i <= numSpeedUpgrades; i++) {
                     if (inventoryGenerator.getBurnTime(stack) <= 0 && !inventoryGenerator.getFuel(stack).isEmpty()
-                        && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
+                            && !(getInternalEnergyStored(stack) == getMaxEnergyStored(stack))) {
                         ItemStack fuel = getFuel(stack);
                         inventoryGenerator.setBurnTime(stack, inventoryGenerator.calculateTime(fuel));
                         fuel.shrink(1);
@@ -105,14 +108,15 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
                         inventoryGenerator.giveEnergyToChargeables(chargeables, stack);
                     }
                 }
-                if (inv.getStackInSlot(3).isEmpty() && hasSideEffect()) {
+                if (inv.getStackInSlot(3).isEmpty() && hasSideEffect() && inventoryGenerator.getBurnTime(stack) > 0) {
                     giveSideEffect(player);
                 }
             }
         }
     }
 
-    public void giveSideEffect(EntityPlayer player) {}
+    public void giveSideEffect(EntityPlayer player) {
+    }
 
     public boolean hasSideEffect() {
         return false;
@@ -136,6 +140,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
         }
         return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
     }
+
     @Nullable
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
@@ -148,7 +153,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
         private final InvEnergyStorage energyStorage;
 
         InvEnergyProvider(ItemStack stack, IItemEnergy iItemEnergy) {
-            this.energyStorage =  new InvEnergyStorage(getMaxEnergyStored(stack), getReceive(), getSend(), stack, iItemEnergy);
+            this.energyStorage = new InvEnergyStorage(getMaxEnergyStored(stack), getReceive(), getSend(), stack, iItemEnergy);
             this.inv = new ItemStackHandler(4) {
 
                 @Nonnull
@@ -183,12 +188,11 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
 
         @Override
         public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-            if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(inv);
-            if(capability == CapabilityEnergy.ENERGY) {
+            if (capability == CapabilityEnergy.ENERGY) {
                 return CapabilityEnergy.ENERGY.cast(energyStorage);
-            }
-            else return null;
+            } else return null;
         }
 
         @Override
@@ -241,8 +245,13 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
         }
 
         IItemHandler inv = CapabilityUtils.getCapability(stack, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        ItemStack speedUpgradesStack = inv.getStackInSlot(1);
-        int numSpeedUpgrades = speedUpgradesStack.getCount();
+        int numSpeedUpgrades;
+        if (inv == null) {
+            numSpeedUpgrades = 0;
+        } else {
+            ItemStack speedUpgradesStack = inv.getStackInSlot(1);
+            numSpeedUpgrades = speedUpgradesStack.getCount();
+        }
         tooltip.add(StringHelper.localizeFormat("info.invgens.mode", StringHelper.getKeyName(KeyHandler.MODE_KEY.getKeyCode())));
         tooltip.add(StringHelper.localize("info.invgens.charge") + ": " + StringHelper.getScaledNumber(getInternalEnergyStored(stack))
                 + " / " + StringHelper.getScaledNumber(getMaxEnergyStored(stack)) + " RF");
@@ -256,10 +265,10 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
         ArrayList<ItemStack> chargeables = new ArrayList<>();
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
             ItemStack invStack = player.inventory.getStackInSlot(i);
-                IEnergyStorage energyStorage = CapabilityUtils.getCapability(invStack, CapabilityEnergy.ENERGY, null);
-                if (energyStorage != null && energyStorage.getEnergyStored() < energyStorage.getMaxEnergyStored()) {
-                    chargeables.add(invStack);
-                }
+            IEnergyStorage energyStorage = CapabilityUtils.getCapability(invStack, CapabilityEnergy.ENERGY, null);
+            if (energyStorage != null && energyStorage.getEnergyStored() < energyStorage.getMaxEnergyStored()) {
+                chargeables.add(invStack);
+            }
         }
         return chargeables;
     }
@@ -321,7 +330,7 @@ public class ItemInventoryGenerator extends ItemBase implements IInventoryGenera
 
     @Override
     public int calculatePower(ItemStack stack) {
-        return Math.min(getMaxEnergyStored(stack) - getInternalEnergyStored(stack),  getSend());
+        return Math.min(getMaxEnergyStored(stack) - getInternalEnergyStored(stack), getSend());
     }
 
     @Override

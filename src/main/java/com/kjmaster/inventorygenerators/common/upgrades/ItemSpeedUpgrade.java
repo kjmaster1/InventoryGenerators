@@ -31,7 +31,7 @@ public class ItemSpeedUpgrade extends ItemBase implements IHasModel {
             tooltip.add(StringHelper.shiftForDetails());
         }
         else {
-            tooltip.add(StringHelper.getInfoText("info.invgens.speedupgrade"));
+            tooltip.add(StringHelper.getInfoText("info.invgens.speed_upgrade"));
         }
     }
 }

@@ -2,11 +2,11 @@ package com.kjmaster.inventorygenerators.common.network;
 
 import com.kjmaster.inventorygenerators.client.gui.generator.ContainerGenerator;
 import com.kjmaster.inventorygenerators.client.gui.generator.GuiGenerator;
+import com.kjmaster.inventorygenerators.client.gui.generator.InventoryGenerator;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 
@@ -30,36 +30,36 @@ public class ModGuiHandler implements IGuiHandler {
     @Nullable
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        IItemHandler inv = player.getHeldItemMainhand().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        ItemStack stack = player.getHeldItemMainhand();
         switch (ID) {
             case culinary:
-                return new GuiGenerator(player.inventory, inv, "culinary");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "culinary");
             case death:
-                return new GuiGenerator(player.inventory, inv, "death");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "death");
             case end:
-                return new GuiGenerator(player.inventory, inv, "end");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "end");
             case explosive:
-                return new GuiGenerator(player.inventory, inv, "explosive");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "explosive");
             case frosty:
-                return new GuiGenerator(player.inventory, inv, "frosty");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "frosty");
             case furnace:
-                return new GuiGenerator(player.inventory, inv, "furnace");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "furnace");
             case halitosis:
-                return new GuiGenerator(player.inventory, inv, "halitosis");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "halitosis");
             case magmatic:
-                return new GuiGenerator(player.inventory, inv, "magmatic");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "magmatic");
             case netherstar:
-                return new GuiGenerator(player.inventory, inv, "nether_star");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "nether_star");
             case overclocked:
-                return new GuiGenerator(player.inventory, inv, "overclocked");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "overclocked");
             case pink:
-                return new GuiGenerator(player.inventory, inv, "pink");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "pink");
             case potion:
-                return new GuiGenerator(player.inventory, inv, "potion");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "potion");
             case slimey:
-                return new GuiGenerator(player.inventory, inv, "slimey");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "slimey");
             case survivalist:
-                return new GuiGenerator(player.inventory, inv, "survivalist");
+                return new GuiGenerator(player.inventory, new InventoryGenerator(stack), "survivalist");
 
         }
         return null;
@@ -69,8 +69,8 @@ public class ModGuiHandler implements IGuiHandler {
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         if (ID < 14) {
-            IItemHandler inv = player.getHeldItemMainhand().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            return new ContainerGenerator(player.inventory, inv);
+            ItemStack stack = player.getHeldItemMainhand();
+            return new ContainerGenerator(player.inventory, new InventoryGenerator(stack));
         }
         return null;
     }
